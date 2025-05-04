@@ -16,7 +16,10 @@ async def find_tilbud(playwright):
         print("Ingen cookie-popup – går videre.")
 
     # Sæt postnummer til Skagen (9990)
-    await page.click("button[aria-label='Skift lokalavis']")
+    try:
+        await page.click("button[aria-label='Skift lokalavis']", timeout=3000)
+    except:
+        print("Kunne ikke finde 'Skift lokalavis' – måske allerede sat.")
     await page.fill("input[placeholder='Postnummer eller by']", "9990")
     await page.keyboard.press("Enter")
     await page.wait_for_timeout(3000)
