@@ -10,7 +10,10 @@ async def find_tilbud(playwright):
     page = await context.new_page()
 
     await page.goto("https://etilbudsavis.dk")
-    await page.locator("text=Acceptér alle").click(timeout=5000)
+    try:
+        await page.locator("text=Acceptér alle").click(timeout=3000)
+    except:
+        print("Ingen cookie-popup – går videre.")
 
     # Sæt postnummer til Skagen (9990)
     await page.click("button[aria-label='Skift lokalavis']")
