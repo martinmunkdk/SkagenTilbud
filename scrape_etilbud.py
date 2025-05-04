@@ -26,6 +26,7 @@ async def find_tilbud(playwright):
 
     try:
         try:
+    try:
     felt = page.locator("input[aria-label*='Postnummer']")
     await felt.fill("9990")
     await page.keyboard.press("Enter")
@@ -38,6 +39,7 @@ async def find_tilbud(playwright):
         print("Kunne ikke aflæse avisnavn – måske allerede valgt eller element ikke synligt.")
 except:
     print("Kunne ikke sætte postnummer – måske allerede sat eller felt ikke fundet.")
+
     await felt.fill("9990")
     await page.keyboard.press("Enter")
     await page.wait_for_timeout(5000)
