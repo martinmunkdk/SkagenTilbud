@@ -1,0 +1,26 @@
+name: Daglig tilbuds-scraper
+
+on:
+  schedule:
+    - cron: '0 5 * * *'  # Hver dag kl. 07 dansk tid
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Tjek repo ud
+        uses: actions/checkout@v3
+
+      - name: Sæt Python op
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Installer Playwright
+        run: |
+          pip install playwright
+          playwright install chromium
+
+      - name: Kør scraper
+        run: python scrape_etilbud.py
