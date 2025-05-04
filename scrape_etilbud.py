@@ -1,24 +1,7 @@
 import asyncio
 from playwright.async_api import async_playwright
 
-SØGEORD = [
-    "Gevalia kaffe",
-    "toiletpapir",
-    "38% fløde",
-    "Coca Cola 24",
-    "Kærgården",
-    "Lurpak",
-    "smør",
-    "Mørk pålægschokolade 47% kakao",
-    "Galle & Jessen",
-    "kærgården smør",
-    "pålægger pålæg",
-    "omo flydende vask",
-    "tuborg squash 24 x 33 cl",
-    "naturli",
-    "libero bleer"
-]
-
+SØGEORD = ["Gevalia kaffe", "toiletpapir", "38% fløde", "Coca Cola 24"]
 BUTIKKER_SKAGEN = ["SuperBrugsen", "Netto", "Rema 1000", "Lidl", "Fakta"]
 
 async def find_tilbud(playwright):
@@ -27,6 +10,7 @@ async def find_tilbud(playwright):
     page = await context.new_page()
 
     await page.goto("https://etilbudsavis.dk")
+    await page.wait_for_timeout(3000)
 
     # Cookie-popup
     try:
@@ -41,16 +25,23 @@ async def find_tilbud(playwright):
         print("Kunne ikke finde 'Skift lokalavis' – måske allerede sat.")
 
     try:
-        await page.locator("input").first.fill("9990")
+        try:
+        felt = page.locator("input[aria-label*='Postnummer']")
+        await felt.fill("9990")
         await page.keyboard.press("Enter")
-        await page.wait_for_timeout(3000)
+        await page.wait_for_timeout(5000)
+        print("Postnummer 9990 indtastet.")
+    except:
+        print("Kunne ikke sætte postnummer – måske allerede sat eller felt ikke fundet.")
     except:
         print("Kunne ikke indtaste postnummer – muligvis allerede sat.")
 
-    tilbud = []
+    print("Søger nu på varer i valgt område...")
+tilbud = []
 
     for søgeord in SØGEORD:
         await page.goto("https://etilbudsavis.dk")
+    await page.wait_for_timeout(3000)
         try:
             await page.locator("input").first.fill(søgeord)
             await page.keyboard.press("Enter")
