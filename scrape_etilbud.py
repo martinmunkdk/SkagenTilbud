@@ -27,6 +27,15 @@ async def find_tilbud(playwright):
     try:
         try:
     felt = page.locator("input[aria-label*='Postnummer']")
+    await felt.fill("9990")
+    await page.keyboard.press("Enter")
+    await page.wait_for_timeout(5000)
+    print("Postnummer 9990 indtastet.")
+    try:
+        avisnavn = await page.locator("button[aria-label='Skift lokalavis']").text_content()
+        print(f"Avis/lokalområde valgt: {avisnavn.strip()}")
+    except:
+        print("Kunne ikke aflæse avisnavn – måske allerede valgt eller element ikke synligt.")
         await felt.fill("9990")
         await page.keyboard.press("Enter")
         await page.wait_for_timeout(5000)
@@ -83,9 +92,30 @@ async def main():
     async with async_playwright() as playwright:
         tilbud = await find_tilbud(playwright)
         tilbud.sort(key=lambda x: x["pris"].replace(",", ".").replace("kr", "").strip()[:5])
-        for t in tilbud:
-            print(f"{t['produkt']} – {t['pris']} hos {t['butik']} ({t['gyldig']})")
-            print(f"{t['link']}")
-            print("")
+        html_body = "<h3>🛒 Dagens tilbud:</h3><ul>"
+            for t in tilbud:
+                print(f"{t['produkt']} – {t['pris']} hos {t['butik']} ({t['gyldig']})")
+                print(f"{t['link']}")
+                print("")
+                html_body += f"<li><b>{t['produkt']}</b> – {t['pris']} hos {t['butik']} ({t['gyldig']})<br><a href='{t['link']}'>Se tilbud</a></li>"
+            html_body += "</ul>"
+
+            gmail_user = os.environ["GMAIL_USER"]
+            gmail_pass = os.environ["GMAIL_PASS"]
+            recipient = os.environ.get("GMAIL_TO", gmail_user)
+
+            msg = MIMEText(html_body, "html")
+            msg["Subject"] = "🛒 Dagens tilbud i Skagen"
+            msg["From"] = gmail_user
+            msg["To"] = recipient
+
+            try:
+                with smtplib.SMTP("smtp.gmail.com", 587) as server:
+                    server.starttls()
+                    server.login(gmail_user, gmail_pass)
+                    server.send_message(msg)
+                print("E-mail sendt med tilbud.")
+            except Exception as e:
+                print(f"Fejl ved afsendelse af e-mail: {e}")
 
 asyncio.run(main())
