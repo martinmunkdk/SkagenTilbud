@@ -25,6 +25,6 @@ except:
     print("Kunne ikke sætte postnummer – måske allerede sat eller felt ikke fundet.")
 
 
-        await browser.close()
+            await browser.close()
 
 asyncio.run(main())
