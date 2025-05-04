@@ -1,7 +1,24 @@
 import asyncio
 from playwright.async_api import async_playwright
 
-SØGEORD = ["Gevalia kaffe", "toiletpapir", "38% fløde", "Coca Cola 24"]
+SØGEORD = [
+    "Gevalia kaffe",
+    "toiletpapir",
+    "38% fløde",
+    "Coca Cola 24",
+    "Kærgården",
+    "Lurpak",
+    "smør",
+    "Mørk pålægschokolade 47% kakao",
+    "Galle & Jessen",
+    "kærgården smør",
+    "pålægger pålæg",
+    "omo flydende vask",
+    "tuborg squash 24 x 33 cl",
+    "naturli",
+    "libero bleer"
+]
+
 BUTIKKER_SKAGEN = ["SuperBrugsen", "Netto", "Rema 1000", "Lidl", "Fakta"]
 
 async def find_tilbud(playwright):
