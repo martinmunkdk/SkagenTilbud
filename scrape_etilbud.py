@@ -36,6 +36,16 @@ async def find_tilbud(playwright):
         print(f"Avis/lokalområde valgt: {avisnavn.strip()}")
     except:
         print("Kunne ikke aflæse avisnavn – måske allerede valgt eller element ikke synligt.")
+
+    await felt.fill("9990")
+    await page.keyboard.press("Enter")
+    await page.wait_for_timeout(5000)
+    print("Postnummer 9990 indtastet.")
+    try:
+        avisnavn = await page.locator("button[aria-label='Skift lokalavis']").text_content()
+        print(f"Avis/lokalområde valgt: {avisnavn.strip()}")
+    except:
+        print("Kunne ikke aflæse avisnavn – måske allerede valgt eller element ikke synligt.")
         await felt.fill("9990")
         await page.keyboard.press("Enter")
         await page.wait_for_timeout(5000)
