@@ -26,7 +26,7 @@ async def find_tilbud(playwright):
 
     try:
         try:
-        felt = page.locator("input[aria-label*='Postnummer']")
+    felt = page.locator("input[aria-label*='Postnummer']")
         await felt.fill("9990")
         await page.keyboard.press("Enter")
         await page.wait_for_timeout(5000)
