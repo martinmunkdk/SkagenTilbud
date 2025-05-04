@@ -10,45 +10,58 @@ async def find_tilbud(playwright):
     page = await context.new_page()
 
     await page.goto("https://etilbudsavis.dk")
+
+    # Cookie-popup
     try:
         await page.locator("text=Acceptér alle").click(timeout=3000)
     except:
         print("Ingen cookie-popup – går videre.")
 
-    # Sæt postnummer til Skagen (9990)
+    # Skift lokalavis
     try:
         await page.click("button[aria-label='Skift lokalavis']", timeout=3000)
     except:
         print("Kunne ikke finde 'Skift lokalavis' – måske allerede sat.")
-    await page.locator("input").first.fill("9990")
-    await page.keyboard.press("Enter")
-    await page.wait_for_timeout(3000)
+
+    try:
+        await page.locator("input").first.fill("9990")
+        await page.keyboard.press("Enter")
+        await page.wait_for_timeout(3000)
+    except:
+        print("Kunne ikke indtaste postnummer – muligvis allerede sat.")
 
     tilbud = []
 
     for søgeord in SØGEORD:
         await page.goto("https://etilbudsavis.dk")
-        await page.fill("input[placeholder='Søg efter produkter']", søgeord)
-        await page.keyboard.press("Enter")
-        await page.wait_for_timeout(4000)
+        try:
+            await page.locator("input").first.fill(søgeord)
+            await page.keyboard.press("Enter")
+            await page.wait_for_timeout(4000)
+        except:
+            print(f"Kunne ikke søge efter: {søgeord}")
+            continue
 
         cards = page.locator(".sc-bcXHqe")
         count = await cards.count()
         for i in range(count):
-            title = await cards.nth(i).locator("h3").text_content()
-            price = await cards.nth(i).locator(".sc-cpmKsF").text_content()
-            store = await cards.nth(i).locator(".sc-jXbUNg").text_content()
-            validity = await cards.nth(i).locator(".sc-dKfzgJ").text_content()
-            link = await cards.nth(i).locator("a").get_attribute("href")
+            try:
+                title = await cards.nth(i).locator("h3").text_content()
+                price = await cards.nth(i).locator(".sc-cpmKsF").text_content()
+                store = await cards.nth(i).locator(".sc-jXbUNg").text_content()
+                validity = await cards.nth(i).locator(".sc-dKfzgJ").text_content()
+                link = await cards.nth(i).locator("a").get_attribute("href")
 
-            if any(butik in store for butik in BUTIKKER_SKAGEN):
-                tilbud.append({
-                    "produkt": title.strip(),
-                    "pris": price.strip(),
-                    "butik": store.strip(),
-                    "gyldig": validity.strip(),
-                    "link": f"https://etilbudsavis.dk{link}"
-                })
+                if any(butik in store for butik in BUTIKKER_SKAGEN):
+                    tilbud.append({
+                        "produkt": title.strip(),
+                        "pris": price.strip(),
+                        "butik": store.strip(),
+                        "gyldig": validity.strip(),
+                        "link": f"https://etilbudsavis.dk{link}"
+                    })
+            except:
+                continue
 
     await browser.close()
     return tilbud
